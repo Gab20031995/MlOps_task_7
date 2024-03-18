@@ -1,44 +1,51 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, HTTPException
 from fastapi.responses import JSONResponse
-import uuid
-
-from starlette.websockets import WebSocket
+import pandas as pd
+import joblib
 
 app = FastAPI(
     title="Apis task 6",
     version="0.0.1"
 )
 
-@app.post("/api/v1/users")
-async def create_user(username: str, name: str):
-    return {
-        "username": username,
-        "name": name,
-        "id": str(uuid.uuid4()),
-        "message": "User created successfully",
-        "status_code": 201
+#-------------------------------------------------------------
+# LOAD MODEL
+#-------------------------------------------------------------
+
+model = joblib.load("model/logistic_regression_model_v01.pkl")
+
+
+@app.post("/api/v1/apple-sorter", tags=["apple-sorter"])
+async def predict(
+    Size: float,
+    Weight: float,
+    Sweetness: float,
+    Crunchiness: float,
+    Juiciness: float,
+    Ripeness: float,
+    Acidity: float
+):
+
+    dictionary = {
+        'Size': Size,
+        'Weight': Weight,
+        'Sweetness': Sweetness,
+        'Crunchiness': Crunchiness,
+        'Juiciness': Juiciness,
+        'Ripeness': Ripeness,
+        'Acidity': Acidity
     }
 
-@app.get("/api/v1/{user_id}")
-async def create_user(user_id: str):
-    users = {
-        "hola123": {
-            "username": "hola123",
-            "name": "Gabo"
-        }
-    }
-
-
-    if user_id in users:
-
-        user = users[user_id]
-
+    try:
+        df = pd.DataFrame(dictionary, index=[0])
+        prediction = model.predict(df)
         return JSONResponse(
-            content=user,
-            status_code=status.HTTP_200_OK)
-    else:
-        return JSONResponse(
-            content="User not found",
-            status_code=status.HTTP_404_NOT_FOUND
+            status_code=status.HTTP_200_OK,
+            content= 1
         )
+    except Exception as e:
+        raise HTTPException(
+            detail=str(e),
+            status_code=status.HTTP_400_BAD_REQUEST
 
+        )
