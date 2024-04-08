@@ -2,6 +2,10 @@ name: CI Apple sorter
 
 # Trigger
 on:
+  push:
+    branches:
+      - dev
+
   pull_request:
     branches:
       - dev
