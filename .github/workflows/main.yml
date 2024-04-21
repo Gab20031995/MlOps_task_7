@@ -41,8 +41,8 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/deploy-apple-sorter:v1
+            docker pull gab1995/deploy-apple-sorter:v1
             docker stop deploy-apple-sorter || true
             docker rm deploy-apple-sorter || true
-            docker run -d --name deploy-apple-sorter -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/deploy-apple-sorter:v1
-       
+            docker run -d --name deploy-apple-sorter -p 8000:8000 gab1995/deploy-apple-sorter:v1
+
